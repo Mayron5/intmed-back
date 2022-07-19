@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from medicar.models import Agenda, Consulta, Horario, Medico, Usuario
+from medicar.models import Agenda, Consulta, Horario, Medico, Usuario, Especialidade
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -9,11 +9,17 @@ class UsuarioSerializer(serializers.ModelSerializer):
         exclude = ('senha', )
 
 
+class EspecialidadeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Especialidade
+        fields = '__all__'
+
+
 class MedicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medico
         fields = '__all__'
-        
+
         depth = 1
 
 
@@ -23,9 +29,11 @@ class HorarioSerializer(serializers.ModelSerializer):
         fields = ('horarios', )
         depth = 2
 
+
 class AgendaSerializer(serializers.ModelSerializer):
     horarios = serializers.StringRelatedField(many=True)
-    class Meta: 
+
+    class Meta:
         model = Agenda
         fields = '__all__'
 

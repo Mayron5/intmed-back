@@ -16,16 +16,17 @@ class Usuario(models.Model):
 
 class Especialidade(models.Model):
     nome = models.CharField(max_length=45)
-    
+
     def __str__(self) -> str:
         return self.nome
+
 
 class Medico(models.Model):
     crm = models.IntegerField(unique=True)
     nome = models.CharField(max_length=45)
     email = models.CharField(null=True, blank=True, max_length=30)
     especialidade = models.ForeignKey(Especialidade, models.CASCADE)
-    
+
     def __str__(self) -> str:
         return self.nome
 
