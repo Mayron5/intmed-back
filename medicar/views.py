@@ -59,15 +59,29 @@ class MedicosViewSet(viewsets.ModelViewSet):
     queryset = Medico.objects.all()
     serializer_class = MedicoSerializer
     filter_backends = [SearchFilter]
-    search_fields = ['especialidade__nome']
+    search_fields = ['especialidade__id']
 
 
-class AgendasViewSet(viewsets.ModelViewSet):
+class AgendasViewSet(APIView):
 
-    queryset = Agenda.objects.filter(dia__range=['2022-07-19', '2022-07-19'])
-    filter_backends = [SearchFilter]
-    search_fields = ['medico__id']
     serializer_class = AgendaSerializer
+    
+    def get_queryset(self):
+        agendas = Agenda.objects.all()
+        return agendas
+    
+    def get(self, request, *args, **kwargs):
+        agendas = self.get_queryset()
+        
+        if request.GET.get('medico'):
+            agendas = agendas.filter(medico__id = request.GET.get('medico'))
+            
+        if request.GET.get('especialidade'):
+            agendas = agendas.filter(medico__especialidade__id = request.GET.get('especialidade'))
+            
+        serializer = AgendaSerializer(agendas, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
 
 
 class Login(APIView):

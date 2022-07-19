@@ -8,12 +8,12 @@ from medicar.views import AgendasViewSet, ConsultasViewSet, EspecialidadesView, 
 
 router = routers.DefaultRouter()
 router.register('medicos', MedicosViewSet)
-router.register('agendas', AgendasViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     re_path('usuarios', UsuariosViewSet.as_view()),
+    re_path('agendas', AgendasViewSet.as_view()),
     re_path('usuario/login', Login.as_view()),
     re_path('consultas', ConsultasViewSet.as_view()),
     re_path('especialidades', EspecialidadesView.as_view())
