@@ -9,6 +9,7 @@ from medicar.views import AgendasViewSet, ConsultasViewSet, EspecialidadesViewSe
 router = routers.DefaultRouter()
 router.register('medicos', MedicosViewSet)
 
+#Rotas da API
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
