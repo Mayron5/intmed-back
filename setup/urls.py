@@ -1,15 +1,19 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.urls import re_path
 
-from medicar.views import AgendasViewSet, ConsultasViewSet, EspecialidadesViewSet, Login, UsuariosViewSet
+from rest_framework import routers
 
-#Rotas da API
+from medicar.views import AgendasViewSet, ConsultasViewSet, EspecialidadesViewSet, Login, MedicosViewSet, UsuariosViewSet
+
+router = routers.DefaultRouter()
+router.register('medicos', MedicosViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path('usuario/login', Login.as_view()),
+    path('', include(router.urls)),
     re_path('usuarios', UsuariosViewSet.as_view()),
+    re_path('usuario/login', Login.as_view()),
     re_path('agendas', AgendasViewSet.as_view()),
     re_path('consultas', ConsultasViewSet.as_view()),
     re_path('especialidades', EspecialidadesViewSet.as_view())

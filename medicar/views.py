@@ -1,9 +1,11 @@
+from datetime import datetime
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
-from medicar.models import Agenda, Consulta, Especialidade, Horario, Usuario
-from medicar.serializers import AgendaSerializer, ConsultaSerializer, EspecialidadeSerializer, UsuarioSerializer
+from rest_framework.filters import SearchFilter
+from medicar.models import Agenda, Consulta, Especialidade, Horario, Usuario, Medico
+from medicar.serializers import AgendaSerializer, ConsultaSerializer, EspecialidadeSerializer, MedicoSerializer, UsuarioSerializer
 from medicar.validators import valida_dia
 
 
@@ -102,7 +104,12 @@ class ConsultasViewSet(APIView):
         return consultas
 
     def get(self, request, *args, **kwargs):
-        consultas = self.get_queryset().filter(usuario__id=request.GET.get('userid'))
+        consultas = self.get_queryset()
+
+        if self.request.GET.get('userid'):
+            consultas = consultas.filter(
+                usuario__id=self.request.GET.get('userid'))
+
         serializer = ConsultaSerializer(consultas, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -119,7 +126,10 @@ class ConsultasViewSet(APIView):
         dados_agenda = Agenda.objects.get(
             pk=dados_consulta['agenda_id'])
 
-        dados_usuario = Usuario.objects.get(pk=1)
+        if not valida_dia(dados_agenda.dia, dados_horario.horario):
+            return Response('Não é possível marcar uma consulta passada', status=status.HTTP_412_PRECONDITION_FAILED)
+
+        dados_usuario = Usuario.objects.get(pk=dados_consulta['usuario_id'])
         nova_consulta = Consulta.objects.create(
             dia=dados_agenda.dia, horario=dados_consulta['horario'], agenda=dados_agenda, usuario=dados_usuario)
 
@@ -138,12 +148,21 @@ class ConsultasViewSet(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if not valida_dia(consulta.dia):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
+        if not valida_dia(consulta.dia, consulta.horario):
+            return Response('Não é possível desmarcar uma consulta passada', status=status.HTTP_412_PRECONDITION_FAILED)
+        
+        
         horario = Horario.objects.get(horario=consulta.horario)
         horario.disponivel = True
         horario.save()
 
         consulta.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MedicosViewSet(viewsets.ModelViewSet):
+    """Listando todos os médicos"""
+    queryset = Medico.objects.all()
+    serializer_class = MedicoSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['especialidade__id']
