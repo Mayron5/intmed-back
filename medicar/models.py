@@ -69,4 +69,4 @@ class Consulta(models.Model):
     agenda = models.ForeignKey(Agenda, models.CASCADE)
 
     def __str__(self):
-        return str(' | Paciente - ' + self.usuario.nome)
+        return str(' Paciente - ' + self.usuario.nome)
