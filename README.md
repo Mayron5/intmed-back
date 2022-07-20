@@ -1,5 +1,9 @@
 # Desafio IntMed - Backend
 
+### Produção
+
+- Link de produção: https://intmed-back.azurewebsites.net
+
 ### Pre-requisitos
 
 - Primeiro crie um ambiente virtual e ative ele:
